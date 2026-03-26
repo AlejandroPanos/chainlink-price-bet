@@ -13,7 +13,9 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
  */
 contract PriceBet {
     /* Errors */
-    error PriceBet__YouAreNotTheOwner();
+    error PriceBet__NotEnoughMoneySent();
+    error PriceBet__DurationMustBeLonger();
+    error PriceBet__BetAlreadyStarted();
 
     /* Type declarations */
     enum Side {
@@ -22,6 +24,7 @@ contract PriceBet {
     }
 
     enum State {
+        Idle,
         Opened,
         Ongoing,
         Settled
@@ -29,7 +32,16 @@ contract PriceBet {
 
     /* State variables */
     address public immutable i_owner;
+    uint256 public constant MIN_AMOUNT = 0.1 ether;
+    uint256 public constant MIN_DURATION = 1 days;
     AggregatorV3Interface private s_priceFeed;
+    State private s_state;
+    Side public s_trackSide;
+    uint256 public s_targetPrice;
+    address public playerOne;
+    uint256 public s_wagerBet;
+    uint256 public s_betDuration;
+    uint256 public s_startTime;
 
     /* Events */
     event BetOpened(address indexed player);
@@ -41,7 +53,31 @@ contract PriceBet {
     }
 
     /* Functions */
-    function openBet() external {}
+    function openBet(uint256 targetPrice, uint256 duration, Side playerSide) external payable {
+        // Check
+        if (msg.value < MIN_AMOUNT) {
+            revert PriceBet__NotEnoughMoneySent();
+        }
+
+        if (duration < MIN_DURATION) {
+            revert PriceBet__DurationMustBeLonger();
+        }
+
+        if (s_state != State.Idle) {
+            revert PriceBet__BetAlreadyStarted();
+        }
+
+        // Effects
+        s_trackSide = playerSide;
+        s_targetPrice = targetPrice;
+        s_wagerBet = msg.value;
+        s_betDuration = duration;
+        s_startTime = block.timestamp;
+        s_state = State.Opened;
+
+        // Interactions
+        emit BetOpened(msg.sender);
+    }
 
     /* Getter functions */
     function getOwner() external view returns (address) {
