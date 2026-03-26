@@ -20,6 +20,9 @@ contract PriceBet {
     error PriceBet__CannotUseSameSide();
     error PriceBet__YouMustMatchTheBet();
     error PriceBet__CannotBeTheSamePlayer();
+    error PriceBet__CannotSettleBet();
+    error PriceBet__NotEnoughTimeHasPassed();
+    error PriceBet__TransferFailed();
 
     /* Type declarations */
     enum Side {
@@ -41,7 +44,7 @@ contract PriceBet {
 
     uint256 private constant MIN_AMOUNT = 0.1 ether;
     uint256 private constant MIN_DURATION = 1 days;
-    uint256 private s_targetPrice;
+    int256 private s_targetPrice;
     address private s_playerOne;
     address private s_playerTwo;
     uint256 private s_wagerBet;
@@ -51,6 +54,7 @@ contract PriceBet {
     /* Events */
     event BetOpened(address indexed player, uint256 indexed value, uint256 indexed bet);
     event BetJoined(address indexed player);
+    event NewWinner(address indexed winner);
 
     /* Constructor */
     constructor(address priceFeed) {
@@ -58,7 +62,7 @@ contract PriceBet {
     }
 
     /* Functions */
-    function openBet(uint256 targetPrice, uint256 duration, Side playerSide) external payable {
+    function openBet(int256 targetPrice, uint256 duration, Side playerSide) external payable {
         // Check
         if (msg.value < MIN_AMOUNT) {
             revert PriceBet__NotEnoughMoneySent();
@@ -88,7 +92,7 @@ contract PriceBet {
 
     function joinBet(Side playerSide) external payable {
         // Checks
-        if (s_state == State.Idle || s_state == State.Settled || s_state == State.Ongoing) {
+        if (s_state != State.Opened) {
             revert PriceBet__BetNotAvailable();
         }
 
@@ -114,10 +118,34 @@ contract PriceBet {
 
     function settleBet() external {
         // Checks
+        if (s_state != State.Ongoing) {
+            revert PriceBet__CannotSettleBet();
+        }
+
+        if (block.timestamp < (s_startTime + s_betDuration)) {
+            revert PriceBet__NotEnoughTimeHasPassed();
+        }
 
         // Effects
+        (, int256 currentPrice,,,) = s_priceFeed.latestRoundData();
+        bool isHigher = currentPrice > s_targetPrice;
+
+        address winner;
+        if (s_trackSide == Side.High && isHigher || s_trackSide == Side.Low && !isHigher) {
+            winner = s_playerOne;
+        } else {
+            winner = s_playerTwo;
+        }
+
+        s_state = State.Settled;
+
+        (bool success,) = payable(winner).call{value: address(this).balance}("");
+        if (!success) {
+            revert PriceBet__TransferFailed();
+        }
 
         // Interactions
+        emit NewWinner(winner);
     }
 
     /* Getter functions */
