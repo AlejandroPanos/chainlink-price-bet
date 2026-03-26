@@ -40,8 +40,9 @@ contract PriceBet {
     /* State variables */
     AggregatorV3Interface private s_priceFeed;
     State private s_state;
-    Side private s_trackSide;
 
+    Side private s_playerOneSide;
+    Side private s_playerTwoSide;
     uint256 private constant MIN_AMOUNT = 0.1 ether;
     uint256 private constant MIN_DURATION = 1 days;
     int256 private s_targetPrice;
@@ -78,7 +79,7 @@ contract PriceBet {
 
         // Effects
         s_state = State.Opened;
-        s_trackSide = playerSide;
+        s_playerOneSide = playerSide;
 
         s_targetPrice = targetPrice;
         s_playerOne = msg.sender;
@@ -96,7 +97,7 @@ contract PriceBet {
             revert PriceBet__BetNotAvailable();
         }
 
-        if (playerSide == s_trackSide) {
+        if (playerSide == s_playerOneSide) {
             revert PriceBet__CannotUseSameSide();
         }
 
@@ -110,6 +111,7 @@ contract PriceBet {
 
         // Effects
         s_playerTwo = msg.sender;
+        s_playerTwoSide = playerSide;
         s_state = State.Ongoing;
 
         // Interactions
@@ -131,7 +133,7 @@ contract PriceBet {
         bool isHigher = currentPrice > s_targetPrice;
 
         address winner;
-        if (s_trackSide == Side.High && isHigher || s_trackSide == Side.Low && !isHigher) {
+        if (s_playerOneSide == Side.High && isHigher || s_playerOneSide == Side.Low && !isHigher) {
             winner = s_playerOne;
         } else {
             winner = s_playerTwo;
