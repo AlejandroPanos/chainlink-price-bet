@@ -39,6 +39,7 @@ contract PriceBet {
     uint256 private constant MIN_DURATION = 1 days;
     uint256 private s_targetPrice;
     address private s_playerOne;
+    address private s_playerTwo;
     uint256 private s_wagerBet;
     uint256 private s_betDuration;
     uint256 private s_startTime;
@@ -78,6 +79,14 @@ contract PriceBet {
 
         // Interactions
         emit BetOpened(msg.sender);
+    }
+
+    function joinBet(Side playerSide) external payable {
+        // Checks
+
+        // Effects
+
+        // Interactions
     }
 
     /* Getter functions */
