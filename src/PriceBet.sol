@@ -112,5 +112,13 @@ contract PriceBet {
         emit BetJoined(msg.sender);
     }
 
+    function settleBet() external {
+        // Checks
+
+        // Effects
+
+        // Interactions
+    }
+
     /* Getter functions */
 }
