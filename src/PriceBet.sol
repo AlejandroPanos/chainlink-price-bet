@@ -87,7 +87,7 @@ contract PriceBet {
 
     function joinBet(Side playerSide) external payable {
         // Checks
-        if (s_state == State.Idle || s_state == State.Settled) {
+        if (s_state == State.Idle || s_state == State.Settled || s_state == State.Ongoing) {
             revert PriceBet__BetNotAvailable();
         }
 
