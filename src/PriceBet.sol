@@ -31,17 +31,17 @@ contract PriceBet {
     }
 
     /* State variables */
-    address public immutable i_owner;
-    uint256 public constant MIN_AMOUNT = 0.1 ether;
-    uint256 public constant MIN_DURATION = 1 days;
+    address private immutable i_owner;
+    uint256 private constant MIN_AMOUNT = 0.1 ether;
+    uint256 private constant MIN_DURATION = 1 days;
     AggregatorV3Interface private s_priceFeed;
     State private s_state;
-    Side public s_trackSide;
-    uint256 public s_targetPrice;
-    address public playerOne;
-    uint256 public s_wagerBet;
-    uint256 public s_betDuration;
-    uint256 public s_startTime;
+    Side private s_trackSide;
+    uint256 private s_targetPrice;
+    address private s_playerOne;
+    uint256 private s_wagerBet;
+    uint256 private s_betDuration;
+    uint256 private s_startTime;
 
     /* Events */
     event BetOpened(address indexed player);
