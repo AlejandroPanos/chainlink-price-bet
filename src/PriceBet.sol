@@ -31,7 +31,6 @@ contract PriceBet {
     }
 
     /* State variables */
-    address private immutable i_owner;
     uint256 private constant MIN_AMOUNT = 0.1 ether;
     uint256 private constant MIN_DURATION = 1 days;
     AggregatorV3Interface private s_priceFeed;
@@ -48,7 +47,6 @@ contract PriceBet {
 
     /* Constructor */
     constructor(address priceFeed) {
-        i_owner = msg.sender;
         s_priceFeed = AggregatorV3Interface(priceFeed);
     }
 
@@ -80,7 +78,4 @@ contract PriceBet {
     }
 
     /* Getter functions */
-    function getOwner() external view returns (address) {
-        return i_owner;
-    }
 }
