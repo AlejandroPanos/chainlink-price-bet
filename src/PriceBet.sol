@@ -106,6 +106,7 @@ contract PriceBet {
 
         // Effects
         s_playerTwo = msg.sender;
+        s_state = State.Ongoing;
 
         // Interactions
         emit BetJoined(msg.sender);
