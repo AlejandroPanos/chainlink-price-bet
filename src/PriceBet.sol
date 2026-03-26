@@ -19,6 +19,7 @@ contract PriceBet {
     error PriceBet__BetNotAvailable();
     error PriceBet__CannotUseSameSide();
     error PriceBet__YouMustMatchTheBet();
+    error PriceBet__CannotBeTheSamePlayer();
 
     /* Type declarations */
     enum Side {
@@ -97,6 +98,10 @@ contract PriceBet {
 
         if (msg.value != s_wagerBet) {
             revert PriceBet__YouMustMatchTheBet();
+        }
+
+        if (msg.sender == s_playerOne) {
+            revert PriceBet__CannotBeTheSamePlayer();
         }
 
         // Effects
