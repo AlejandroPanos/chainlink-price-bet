@@ -31,11 +31,12 @@ contract PriceBet {
     }
 
     /* State variables */
-    uint256 private constant MIN_AMOUNT = 0.1 ether;
-    uint256 private constant MIN_DURATION = 1 days;
     AggregatorV3Interface private s_priceFeed;
     State private s_state;
     Side private s_trackSide;
+
+    uint256 private constant MIN_AMOUNT = 0.1 ether;
+    uint256 private constant MIN_DURATION = 1 days;
     uint256 private s_targetPrice;
     address private s_playerOne;
     uint256 private s_wagerBet;
@@ -66,12 +67,14 @@ contract PriceBet {
         }
 
         // Effects
+        s_state = State.Opened;
         s_trackSide = playerSide;
+
         s_targetPrice = targetPrice;
+        s_playerOne = msg.sender;
         s_wagerBet = msg.value;
         s_betDuration = duration;
         s_startTime = block.timestamp;
-        s_state = State.Opened;
 
         // Interactions
         emit BetOpened(msg.sender);
