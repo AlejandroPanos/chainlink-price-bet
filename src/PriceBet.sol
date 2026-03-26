@@ -16,6 +16,9 @@ contract PriceBet {
     error PriceBet__NotEnoughMoneySent();
     error PriceBet__DurationMustBeLonger();
     error PriceBet__BetAlreadyStarted();
+    error PriceBet__BetNotAvailable();
+    error PriceBet__CannotUseSameSide();
+    error PriceBet__YouMustMatchTheBet();
 
     /* Type declarations */
     enum Side {
@@ -46,6 +49,7 @@ contract PriceBet {
 
     /* Events */
     event BetOpened(address indexed player);
+    event BetJoined(address indexed player);
 
     /* Constructor */
     constructor(address priceFeed) {
@@ -83,10 +87,23 @@ contract PriceBet {
 
     function joinBet(Side playerSide) external payable {
         // Checks
+        if (s_state == State.Idle || s_state == State.Settled) {
+            revert PriceBet__BetNotAvailable();
+        }
+
+        if (playerSide == s_trackSide) {
+            revert PriceBet__CannotUseSameSide();
+        }
+
+        if (msg.value != s_wagerBet) {
+            revert PriceBet__YouMustMatchTheBet();
+        }
 
         // Effects
+        s_playerTwo = msg.sender;
 
         // Interactions
+        emit BetJoined(msg.sender);
     }
 
     /* Getter functions */
