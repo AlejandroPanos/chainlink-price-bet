@@ -48,7 +48,7 @@ contract PriceBet {
     uint256 private s_startTime;
 
     /* Events */
-    event BetOpened(address indexed player);
+    event BetOpened(address indexed player, uint256 indexed value, uint256 indexed bet);
     event BetJoined(address indexed player);
 
     /* Constructor */
@@ -82,7 +82,7 @@ contract PriceBet {
         s_startTime = block.timestamp;
 
         // Interactions
-        emit BetOpened(msg.sender);
+        emit BetOpened(msg.sender, msg.value, s_wagerBet);
     }
 
     function joinBet(Side playerSide) external payable {
