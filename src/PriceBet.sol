@@ -151,4 +151,49 @@ contract PriceBet {
     }
 
     /* Getter functions */
+    function getBetState() external view returns (State) {
+        return s_state;
+    }
+
+    function getPlayerOne() external view returns (address) {
+        return s_playerOne;
+    }
+
+    function getPLayerTwo() external view returns (address) {
+        return s_playerTwo;
+    }
+
+    function getPlayerSide(address playerAddress) external view returns (Side) {
+        if (playerAddress == s_playerOne) {
+            return s_playerOneSide;
+        } else {
+            return s_playerTwoSide;
+        }
+    }
+
+    function getWagerBet() external view returns (uint256) {
+        return s_wagerBet;
+    }
+
+    function getTargetPrice() external view returns (int256) {
+        return s_targetPrice;
+    }
+
+    function getTimeRemaining() external view returns (uint256) {
+        uint256 timeRemaining = block.timestamp - (s_startTime + s_betDuration);
+        return timeRemaining;
+    }
+
+    function getCurrentPrice() external view returns (int256) {
+        (, int256 currentPrice,,,) = s_priceFeed.latestRoundData();
+        return currentPrice;
+    }
+
+    function getStartTime() external view returns (uint256) {
+        return s_startTime;
+    }
+
+    function getDuration() external view returns (uint256) {
+        return s_betDuration;
+    }
 }
