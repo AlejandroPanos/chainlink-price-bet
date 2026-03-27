@@ -36,17 +36,20 @@ contract HelperConfig is Script {
     }
 
     function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {
-
         // Check if there is a price feed already
         if (activeNetworkConfig.priceFeed != address(0)) {
             return activeNetworkConfig;
         }
 
-        // Deploy the Anvil config
+        // Deploy the MockV3Aggregator fake Chainlink price feed
         vm.startBroadcast();
         MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_ANSWER);
         vm.stopBroadcast();
 
+        // Create the Anvil config
+        NetworkConfig memory anvilConfig = NetworkConfig({priceFeed: address(mockPriceFeed)});
 
+        // Return the Anvil config
+        return anvilConfig;
     }
 }
