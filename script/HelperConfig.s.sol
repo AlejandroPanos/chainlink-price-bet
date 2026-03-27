@@ -14,10 +14,11 @@ contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
     uint256 public constant DECIMALS = 8;
     uint256 public constant INITIAL_ANSWER = 2000e8;
+    uint256 public constant SEPOLIA_ID = 11155111;
 
     /* Constructor */
     constructor() {
-        if (block.chainid == 11155111) {
+        if (block.chainid == SEPOLIA_ID) {
             activeNetworkConfig = getSepoliaConfig();
         } else {
             activeNetworkConfig = getAnvilConfig();
