@@ -27,7 +27,7 @@ contract HelperConfig is Script {
     }
 
     /* Functions */
-    function getSepoliaConfig() public returns (NetworkConfig memory) {
+    function getSepoliaConfig() public pure returns (NetworkConfig memory) {
         // Create the Sepolia testnet config
         NetworkConfig memory sepoliaConfig = NetworkConfig({priceFeed: SEPOLIA_CONTRACT_ADDRESS});
 
