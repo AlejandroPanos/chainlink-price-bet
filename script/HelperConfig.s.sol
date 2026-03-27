@@ -12,8 +12,8 @@ contract HelperConfig is Script {
 
     /* State variables */
     NetworkConfig public activeNetworkConfig;
-    uint256 public constant DECIMALS = 8;
-    uint256 public constant INITIAL_ANSWER = 2000e8;
+    uint8 public constant DECIMALS = 8;
+    int256 public constant INITIAL_ANSWER = 2000e8;
     uint256 public constant SEPOLIA_ID = 11155111;
     address public constant SEPOLIA_CONTRACT_ADDRESS = 0x694AA1769357215DE4FAC081bf1f309aDC325306;
 
@@ -35,5 +35,18 @@ contract HelperConfig is Script {
         return sepoliaConfig;
     }
 
-    function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {}
+    function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {
+
+        // Check if there is a price feed already
+        if (activeNetworkConfig.priceFeed != address(0)) {
+            return activeNetworkConfig;
+        }
+
+        // Deploy the Anvil config
+        vm.startBroadcast();
+        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_ANSWER);
+        vm.stopBroadcast();
+
+
+    }
 }
