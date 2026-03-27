@@ -15,18 +15,25 @@ contract HelperConfig is Script {
     uint256 public constant DECIMALS = 8;
     uint256 public constant INITIAL_ANSWER = 2000e8;
     uint256 public constant SEPOLIA_ID = 11155111;
+    address public constant SEPOLIA_CONTRACT_ADDRESS = 0x694AA1769357215DE4FAC081bf1f309aDC325306;
 
     /* Constructor */
     constructor() {
         if (block.chainid == SEPOLIA_ID) {
             activeNetworkConfig = getSepoliaConfig();
         } else {
-            activeNetworkConfig = getAnvilConfig();
+            activeNetworkConfig = getOrCreateAnvilConfig();
         }
     }
 
     /* Functions */
-    function getSepoliaConfig() public returns (NetworkConfig memory) {}
+    function getSepoliaConfig() public returns (NetworkConfig memory) {
+        // Create the Sepolia testnet config
+        NetworkConfig memory sepoliaConfig = NetworkConfig({priceFeed: SEPOLIA_CONTRACT_ADDRESS});
 
-    function getAnvilConfig() public returns (NetworkConfig memory) {}
+        // Return the config
+        return sepoliaConfig;
+    }
+
+    function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {}
 }
