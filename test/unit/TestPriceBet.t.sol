@@ -274,4 +274,19 @@ contract TestPriceBet is Test {
         // Act / Assert
         priceBet.settleBet();
     }
+
+    function testRevertsIfNotEnoughTimeHasPassed() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+
+        vm.prank(JOINER);
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
+
+        vm.warp(block.timestamp + (DURATION - 1 days));
+        vm.expectRevert(PriceBet__NotEnoughTimeHasPassed.selector);
+
+        // Act / Assert
+        priceBet.settleBet();
+    }
 }
