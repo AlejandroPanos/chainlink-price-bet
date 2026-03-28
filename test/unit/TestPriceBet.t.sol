@@ -217,4 +217,17 @@ contract TestPriceBet is Test {
         // Assert
         assertEq(priceBet.getPlayerTwo(), JOINER);
     }
+
+    function testPlayerTwoSideGetsSetCorrectlyWhenJoiningBet() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+
+        // Act
+        vm.prank(JOINER);
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
+
+        // Assert
+        assertEq(uint256(priceBet.getPlayerSide(JOINER)), uint256(PLAYER_TWO_SIDE));
+    }
 }
