@@ -105,6 +105,15 @@ contract TestPriceBet is Test {
         assertEq(uint256(priceBet.getPlayerSide(USER)), uint256(PLAYER_SIDE));
     }
 
+    function testTargetPriceGetsSetCorrectly() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+
+        // Assert
+        assertEq(priceBet.getTargetPrice(), TARGET_PRICE);
+    }
+
     function testEmitsBetOpenedWhenOpensBet() public {
         // Arrange
         vm.prank(USER);
