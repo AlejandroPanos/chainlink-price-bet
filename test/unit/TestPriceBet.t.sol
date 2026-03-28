@@ -36,7 +36,7 @@ contract TestPriceBet is Test {
     address private priceFeed;
 
     /* Events */
-    event BetOpened(address indexed player, uint256 indexed value, uint256 indexed bet);
+    event BetOpened(address indexed player, uint256 indexed value);
     event BetJoined(address indexed player);
     event NewWinner(address indexed winner);
 
@@ -84,6 +84,16 @@ contract TestPriceBet is Test {
         vm.expectRevert(PriceBet__BetAlreadyStarted.selector);
 
         // Act / Assert
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+    }
+
+    function testEmitsBetOpenedWhenOpensBet() public {
+        // Arrange
+        vm.prank(USER);
+        vm.expectEmit(true, true, false, false);
+        emit BetOpened(USER, SEND_AMOUNT);
+
+        // Assert
         priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
     }
 }
