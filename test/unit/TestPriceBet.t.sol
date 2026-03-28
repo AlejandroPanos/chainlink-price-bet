@@ -32,7 +32,7 @@ contract TestPriceBet is Test {
     int256 private constant TARGET_PRICE = 3000e8;
     uint256 private constant LOWER_SEND_AMOUNT = 0.01 ether;
     uint256 private constant LOWER_DURATION = 1 minutes;
-    PriceBet.Side private constant PLAYER_SIDE = PriceBet.Side.High;
+    PriceBet.Side private constant PLAYER_ONE_SIDE = PriceBet.Side.High;
     address private priceFeed;
 
     /* Events */
@@ -63,7 +63,7 @@ contract TestPriceBet is Test {
         vm.expectRevert(PriceBet__NotEnoughMoneySent.selector);
 
         // Act / Assert
-        priceBet.openBet{value: LOWER_SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: LOWER_SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
     }
 
     function testRevertsIfNotEnoughDurationSet() public {
@@ -72,25 +72,25 @@ contract TestPriceBet is Test {
         vm.expectRevert(PriceBet__DurationMustBeLonger.selector);
 
         // Act / Assert
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, LOWER_DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, LOWER_DURATION, PLAYER_ONE_SIDE);
     }
 
     function testRevertsIfStateIsNotIdleWhenOpened() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         vm.prank(USER);
         vm.expectRevert(PriceBet__BetAlreadyStarted.selector);
 
         // Act / Assert
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
     }
 
     function testStateChangesToOpenedWhenBetOpens() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         // Assert
         assertEq(uint256(priceBet.getBetState()), uint256(PriceBet.State.Opened));
@@ -99,16 +99,16 @@ contract TestPriceBet is Test {
     function testPlayerSideGetsSetCorrectly() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         // Assert
-        assertEq(uint256(priceBet.getPlayerSide(USER)), uint256(PLAYER_SIDE));
+        assertEq(uint256(priceBet.getPlayerSide(USER)), uint256(PLAYER_ONE_SIDE));
     }
 
     function testTargetPriceGetsSetCorrectly() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         // Assert
         assertEq(priceBet.getTargetPrice(), TARGET_PRICE);
@@ -117,7 +117,7 @@ contract TestPriceBet is Test {
     function testMsgSenderIsPlayerOne() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         // Assert
         assertEq(priceBet.getPlayerOne(), USER);
@@ -126,7 +126,7 @@ contract TestPriceBet is Test {
     function testMsgValueIsWagerBet() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         // Assert
         assertEq(priceBet.getWagerBet(), SEND_AMOUNT);
@@ -135,7 +135,7 @@ contract TestPriceBet is Test {
     function testDurationGetsSetCorrectly() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         // Assert
         assertEq(priceBet.getDuration(), DURATION);
@@ -144,7 +144,7 @@ contract TestPriceBet is Test {
     function testStartTimeGetsSetCorrectly() public {
         // Arrange
         vm.prank(USER);
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
 
         // Assert
         assertEq(priceBet.getStartTime(), block.timestamp);
@@ -157,6 +157,15 @@ contract TestPriceBet is Test {
         emit BetOpened(USER, SEND_AMOUNT);
 
         // Assert
-        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+    }
+
+    function testRevertsIfStateIsNotOpened() public {
+        // Arrange
+        vm.prank(USER);
+        vm.expectRevert(PriceBet__BetNotAvailable.selector);
+
+        // Act / Assert
+        priceBet.joinBet(PLAYER_ONE_SIDE);
     }
 }
