@@ -27,6 +27,10 @@ contract TestPriceBet is Test {
     /* State variables */
     address USER = makeAddr("user");
     uint256 private constant AMOUNT = 10 ether;
+    uint256 private constant SEND_AMOUNT = 0.01 ether;
+    int256 private constant TARGET_PRICE = 3000e8;
+    uint256 private constant DURATION = 1 days;
+    PriceBet.Side private constant PLAYER_SIDE = PriceBet.Side.High;
     address private priceFeed;
 
     /* Events */
@@ -40,6 +44,7 @@ contract TestPriceBet is Test {
         (priceBet, helperConfig) = deployPriceBet.run();
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
         priceFeed = config.priceFeed;
+        vm.deal(USER, AMOUNT);
     }
 
     function testContractStartsWithCorrectPriceFeed() public view {
@@ -48,5 +53,14 @@ contract TestPriceBet is Test {
 
     function testInitialStateIsIdle() public view {
         assertEq(uint256(priceBet.getBetState()), uint256(PriceBet.State.Idle));
+    }
+
+    function testRevertsIfNotEnoughEthSentToOpenBet() public {
+        // Assert
+        vm.prank(USER);
+        vm.expectRevert(PriceBet__NotEnoughMoneySent.selector);
+
+        // Act / Arrange
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
     }
 }
