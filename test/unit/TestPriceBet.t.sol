@@ -45,4 +45,8 @@ contract TestPriceBet is Test {
     function testContractStartsWithCorrectPriceFeed() public view {
         assertEq(priceBet.getPriceFeed(), priceFeed);
     }
+
+    function testInitialStateIsIdle() public view {
+        assertEq(uint256(priceBet.getBetState()), uint256(PriceBet.State.Idle));
+    }
 }
