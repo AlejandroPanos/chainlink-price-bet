@@ -9,9 +9,26 @@ contract TestPriceBet is Test {
     /* Instatiate a new contract */
     PriceBet priceBet;
 
+    /* Errors */
+    error PriceBet__NotEnoughMoneySent();
+    error PriceBet__DurationMustBeLonger();
+    error PriceBet__BetAlreadyStarted();
+    error PriceBet__BetNotAvailable();
+    error PriceBet__CannotUseSameSide();
+    error PriceBet__YouMustMatchTheBet();
+    error PriceBet__CannotBeTheSamePlayer();
+    error PriceBet__CannotSettleBet();
+    error PriceBet__NotEnoughTimeHasPassed();
+    error PriceBet__TransferFailed();
+
     /* State variables */
     address USER = makeAddr("user");
     uint256 private constant AMOUNT = 10 ether;
+
+    /* Events */
+    event BetOpened(address indexed player, uint256 indexed value, uint256 indexed bet);
+    event BetJoined(address indexed player);
+    event NewWinner(address indexed winner);
 
     /* Functions */
     function setUp() public {
