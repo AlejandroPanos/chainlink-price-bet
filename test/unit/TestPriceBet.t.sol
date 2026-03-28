@@ -205,7 +205,7 @@ contract TestPriceBet is Test {
         priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
     }
 
-    function testPlayerTwoGetsSetCorrectly() public {
+    function testPlayerTwoGetsSetCorrectlyWhenJoiningBet() public {
         // Arrange
         vm.prank(USER);
         priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
