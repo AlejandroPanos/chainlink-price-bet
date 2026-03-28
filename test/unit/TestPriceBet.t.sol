@@ -87,6 +87,15 @@ contract TestPriceBet is Test {
         priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
     }
 
+    function testStateChangesToOpenedWhenBetOpens() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+
+        // Assert
+        assertEq(uint256(priceBet.getBetState()), uint256(PriceBet.State.Opened));
+    }
+
     function testEmitsBetOpenedWhenOpensBet() public {
         // Arrange
         vm.prank(USER);
