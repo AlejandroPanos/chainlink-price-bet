@@ -204,4 +204,8 @@ contract PriceBet {
     function getWinner() external view returns (address) {
         return s_winner;
     }
+
+    function getContractBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
 }
