@@ -51,6 +51,7 @@ contract PriceBet {
     uint256 private s_wagerBet;
     uint256 private s_betDuration;
     uint256 private s_startTime;
+    address private s_winner;
 
     /* Events */
     event BetOpened(address indexed player, uint256 indexed value);
@@ -132,22 +133,21 @@ contract PriceBet {
         (, int256 currentPrice,,,) = s_priceFeed.latestRoundData();
         bool isHigher = currentPrice > s_targetPrice;
 
-        address winner;
         if (s_playerOneSide == Side.High && isHigher || s_playerOneSide == Side.Low && !isHigher) {
-            winner = s_playerOne;
+            s_winner = s_playerOne;
         } else {
-            winner = s_playerTwo;
+            s_winner = s_playerTwo;
         }
 
         s_state = State.Settled;
 
-        (bool success,) = payable(winner).call{value: address(this).balance}("");
+        (bool success,) = payable(s_winner).call{value: address(this).balance}("");
         if (!success) {
             revert PriceBet__TransferFailed();
         }
 
         // Interactions
-        emit NewWinner(winner);
+        emit NewWinner(s_winner);
     }
 
     /* Getter functions */
@@ -199,5 +199,9 @@ contract PriceBet {
 
     function getPriceFeed() external view returns (address) {
         return address(s_priceFeed);
+    }
+
+    function getWinner() external view returns (address) {
+        return s_winner;
     }
 }
