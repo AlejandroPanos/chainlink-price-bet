@@ -364,4 +364,23 @@ contract TestPriceBet is Test {
         // Assert
         assertEq(priceBet.getContractBalance(), 0);
     }
+
+    function testEmitsNewWinnerWhenBetSettles() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+
+        vm.prank(JOINER);
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
+
+        vm.warp(block.timestamp + (DURATION + 1 days));
+
+        // Act
+        mockPriceFeed.updateAnswer(HIGHER_PRICE);
+        vm.expectEmit(true, false, false, false);
+        emit NewWinner(USER);
+
+        // Assert
+        priceBet.settleBet();
+    }
 }
