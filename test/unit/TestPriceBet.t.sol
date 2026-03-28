@@ -123,6 +123,15 @@ contract TestPriceBet is Test {
         assertEq(priceBet.getPlayerOne(), USER);
     }
 
+    function testMsgValueIsWagerBet() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+
+        // Assert
+        assertEq(priceBet.getWagerBet(), SEND_AMOUNT);
+    }
+
     function testEmitsBetOpenedWhenOpensBet() public {
         // Arrange
         vm.prank(USER);
