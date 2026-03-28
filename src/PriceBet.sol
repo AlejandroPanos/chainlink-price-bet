@@ -180,8 +180,11 @@ contract PriceBet {
     }
 
     function getTimeRemaining() external view returns (uint256) {
-        uint256 timeRemaining = block.timestamp - (s_startTime + s_betDuration);
-        return timeRemaining;
+        uint256 settlementTime = s_startTime + s_betDuration;
+        if (block.timestamp >= settlementTime) {
+            return 0;
+        }
+        return settlementTime - block.timestamp;
     }
 
     function getCurrentPrice() external view returns (int256) {
