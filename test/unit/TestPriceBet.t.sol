@@ -141,6 +141,15 @@ contract TestPriceBet is Test {
         assertEq(priceBet.getDuration(), DURATION);
     }
 
+    function testStartTimeGetsSetCorrectly() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+
+        // Assert
+        assertEq(priceBet.getStartTime(), block.timestamp);
+    }
+
     function testEmitsBetOpenedWhenOpensBet() public {
         // Arrange
         vm.prank(USER);
