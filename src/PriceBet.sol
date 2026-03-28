@@ -146,6 +146,15 @@ contract PriceBet {
             revert PriceBet__TransferFailed();
         }
 
+        s_playerOne = address(0);
+        s_playerTwo = address(0);
+        s_wagerBet = 0;
+        s_targetPrice = 0;
+        s_startTime = 0;
+        s_betDuration = 0;
+        s_winner = address(0);
+        s_state = State.Idle;
+
         // Interactions
         emit NewWinner(s_winner);
     }
