@@ -159,7 +159,7 @@ contract PriceBet {
         return s_playerOne;
     }
 
-    function getPLayerTwo() external view returns (address) {
+    function getPlayerTwo() external view returns (address) {
         return s_playerTwo;
     }
 
@@ -195,5 +195,9 @@ contract PriceBet {
 
     function getDuration() external view returns (uint256) {
         return s_betDuration;
+    }
+
+    function getPriceFeed() external view returns (AggregatorV3Interface) {
+        return s_priceFeed;
     }
 }

@@ -4,10 +4,13 @@ pragma solidity ^0.8.19;
 import {Test, console} from "forge-std/Test.sol";
 import {PriceBet} from "src/PriceBet.sol";
 import {DeployPriceBet} from "script/DeployPriceBet.s.sol";
+import {HelperConfig} from "script/HelperConfig.s.sol";
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 contract TestPriceBet is Test {
     /* Instatiate a new contract */
     PriceBet priceBet;
+    HelperConfig helperConfig;
 
     /* Errors */
     error PriceBet__NotEnoughMoneySent();
@@ -24,6 +27,7 @@ contract TestPriceBet is Test {
     /* State variables */
     address USER = makeAddr("user");
     uint256 private constant AMOUNT = 10 ether;
+    address private priceFeed;
 
     /* Events */
     event BetOpened(address indexed player, uint256 indexed value, uint256 indexed bet);
@@ -33,7 +37,12 @@ contract TestPriceBet is Test {
     /* Functions */
     function setUp() public {
         DeployPriceBet deployPriceBet = new DeployPriceBet();
-        priceBet = deployPriceBet.run();
-        vm.deal(USER, AMOUNT);
+        (priceBet, helperConfig) = deployPriceBet.run();
+        HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
+        priceFeed = config.priceFeed;
+    }
+
+    function testContractStartsWithCorrectPriceFeed() public view {
+        assertEq(priceBet.getPriceFeed(), priceFeed);
     }
 }

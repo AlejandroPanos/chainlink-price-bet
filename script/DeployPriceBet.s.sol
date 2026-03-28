@@ -6,7 +6,7 @@ import {HelperConfig} from "script/HelperConfig.s.sol";
 import {PriceBet} from "src/PriceBet.sol";
 
 contract DeployPriceBet is Script {
-    function run() external returns (PriceBet) {
+    function run() external returns (PriceBet, HelperConfig) {
         // Get the active network config from the helper config
         HelperConfig helperConfig = new HelperConfig();
         address activePriceFeed = helperConfig.activeNetworkConfig();
@@ -17,6 +17,6 @@ contract DeployPriceBet is Script {
         vm.stopBroadcast();
 
         // Return the contract
-        return priceBet;
+        return (priceBet, helperConfig);
     }
 }
