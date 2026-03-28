@@ -243,4 +243,18 @@ contract TestPriceBet is Test {
         // Assert
         assertEq(uint256(priceBet.getBetState()), uint256(PriceBet.State.Ongoing));
     }
+
+    function testEmitsBetJoinedWhenJoinsBet() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+
+        // Act
+        vm.prank(JOINER);
+        vm.expectEmit(true, false, false, false);
+        emit BetJoined(JOINER);
+
+        // Assert
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
+    }
 }
