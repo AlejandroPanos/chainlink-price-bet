@@ -28,9 +28,10 @@ contract TestPriceBet is Test {
     address USER = makeAddr("user");
     uint256 private constant AMOUNT = 10 ether;
     uint256 private constant SEND_AMOUNT = 0.5 ether;
-    uint256 private constant LOWER_SEND_AMOUNT = 0.01 ether;
+    uint256 private constant DURATION = 7 days;
     int256 private constant TARGET_PRICE = 3000e8;
-    uint256 private constant DURATION = 1 minutes;
+    uint256 private constant LOWER_SEND_AMOUNT = 0.01 ether;
+    uint256 private constant LOWER_DURATION = 1 minutes;
     PriceBet.Side private constant PLAYER_SIDE = PriceBet.Side.High;
     address private priceFeed;
 
@@ -69,6 +70,18 @@ contract TestPriceBet is Test {
         // Arrange
         vm.prank(USER);
         vm.expectRevert(PriceBet__DurationMustBeLonger.selector);
+
+        // Act / Assert
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, LOWER_DURATION, PLAYER_SIDE);
+    }
+
+    function testRevertsIfStateIsNotIdleWhenOpened() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+
+        vm.prank(USER);
+        vm.expectRevert(PriceBet__BetAlreadyStarted.selector);
 
         // Act / Assert
         priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
