@@ -52,6 +52,8 @@ contract TestPriceBet is Test {
         vm.deal(JOINER, AMOUNT);
     }
 
+    /* General Testing Functions */
+
     function testContractStartsWithCorrectPriceFeed() public view {
         assertEq(priceBet.getPriceFeed(), priceFeed);
     }
@@ -59,6 +61,8 @@ contract TestPriceBet is Test {
     function testInitialStateIsIdle() public view {
         assertEq(uint256(priceBet.getBetState()), uint256(PriceBet.State.Idle));
     }
+
+    /* Open Bet Testing Functions */
 
     function testRevertsIfNotEnoughEthSentToOpenBet() public {
         // Arrange
@@ -163,6 +167,8 @@ contract TestPriceBet is Test {
         priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
     }
 
+    /* Join Bet Testing Functions */
+
     function testRevertsIfStateIsNotOpened() public {
         // Arrange
         vm.prank(USER);
@@ -256,5 +262,16 @@ contract TestPriceBet is Test {
 
         // Assert
         priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
+    }
+
+    /* Settle Bet Testing Functions */
+    function testRevertsIfStateIsNotOngoing() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+        vm.expectRevert(PriceBet__CannotSettleBet.selector);
+
+        // Act / Assert
+        priceBet.settleBet();
     }
 }
