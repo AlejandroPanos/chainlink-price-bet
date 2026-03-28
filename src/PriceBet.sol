@@ -23,6 +23,7 @@ contract PriceBet {
     error PriceBet__CannotSettleBet();
     error PriceBet__NotEnoughTimeHasPassed();
     error PriceBet__TransferFailed();
+    error  PriceBet__DirectTransfersNotAllowed();
 
     /* Type declarations */
     enum Side {
@@ -219,5 +220,14 @@ contract PriceBet {
 
     function getContractBalance() external view returns (uint256) {
         return address(this).balance;
+    }
+
+    /* Receive and fallback */
+    receive() external payable {
+        revert PriceBet__DirectTransfersNotAllowed();
+    }
+
+    fallback() external payable {
+        revert PriceBet__DirectTransfersNotAllowed();
     }
 }
