@@ -26,6 +26,7 @@ contract TestPriceBet is Test {
 
     /* State variables */
     address USER = makeAddr("user");
+    address JOINER = makeAddr("joiner");
     uint256 private constant AMOUNT = 10 ether;
     uint256 private constant SEND_AMOUNT = 0.5 ether;
     uint256 private constant DURATION = 7 days;
@@ -165,6 +166,17 @@ contract TestPriceBet is Test {
         vm.prank(USER);
         vm.expectRevert(PriceBet__BetNotAvailable.selector);
 
+        // Act / Assert
+        priceBet.joinBet(PLAYER_ONE_SIDE);
+    }
+
+    function testRevertsIfSideIsSameAsPlayerOne() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+        vm.prank(JOINER);
+        vm.expectRevert(PriceBet__CannotUseSameSide.selector);
+        
         // Act / Assert
         priceBet.joinBet(PLAYER_ONE_SIDE);
     }
