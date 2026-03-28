@@ -6,11 +6,13 @@ import {PriceBet} from "src/PriceBet.sol";
 import {DeployPriceBet} from "script/DeployPriceBet.s.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
 import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+import {MockV3Aggregator} from "test/mocks/MockV3Aggregator.sol";
 
 contract TestPriceBet is Test {
     /* Instatiate a new contract */
     PriceBet priceBet;
     HelperConfig helperConfig;
+    MockV3Aggregator mockPriceFeed;
 
     /* Errors */
     error PriceBet__NotEnoughMoneySent();
@@ -35,6 +37,8 @@ contract TestPriceBet is Test {
     uint256 private constant LOWER_DURATION = 1 minutes;
     PriceBet.Side private constant PLAYER_ONE_SIDE = PriceBet.Side.High;
     PriceBet.Side private constant PLAYER_TWO_SIDE = PriceBet.Side.Low;
+    int256 private constant HIGHER_PRICE = 4000e8;
+    int256 private constant LOWER_PRICE = 2000e8;
     address private priceFeed;
 
     /* Events */
@@ -48,6 +52,7 @@ contract TestPriceBet is Test {
         (priceBet, helperConfig) = deployPriceBet.run();
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
         priceFeed = config.priceFeed;
+        mockPriceFeed = MockV3Aggregator(priceFeed);
         vm.deal(USER, AMOUNT);
         vm.deal(JOINER, AMOUNT);
     }
@@ -288,5 +293,23 @@ contract TestPriceBet is Test {
 
         // Act / Assert
         priceBet.settleBet();
+    }
+
+    function testPlayerBettingHighWinsIfPriceIsGreater() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+
+        vm.prank(JOINER);
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
+
+        vm.warp(block.timestamp + (DURATION + 1 days));
+
+        // Act
+        mockPriceFeed.updateAnswer(HIGHER_PRICE);
+        priceBet.settleBet();
+
+        // Assert
+        assertEq(priceBet.getWinner(), USER);
     }
 }
