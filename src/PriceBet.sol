@@ -197,7 +197,7 @@ contract PriceBet {
         return s_betDuration;
     }
 
-    function getPriceFeed() external view returns (AggregatorV3Interface) {
-        return s_priceFeed;
+    function getPriceFeed() external view returns (address) {
+        return address(s_priceFeed);
     }
 }
