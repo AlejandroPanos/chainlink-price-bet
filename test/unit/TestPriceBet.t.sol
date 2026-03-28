@@ -29,7 +29,7 @@ contract TestPriceBet is Test {
     uint256 private constant AMOUNT = 10 ether;
     uint256 private constant SEND_AMOUNT = 0.01 ether;
     int256 private constant TARGET_PRICE = 3000e8;
-    uint256 private constant DURATION = 1 days;
+    uint256 private constant DURATION = 1 minutes;
     PriceBet.Side private constant PLAYER_SIDE = PriceBet.Side.High;
     address private priceFeed;
 
@@ -56,11 +56,17 @@ contract TestPriceBet is Test {
     }
 
     function testRevertsIfNotEnoughEthSentToOpenBet() public {
-        // Assert
+        // Arrange
         vm.prank(USER);
         vm.expectRevert(PriceBet__NotEnoughMoneySent.selector);
 
-        // Act / Arrange
+        // Act / Assert
         priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_SIDE);
+    }
+
+    function testRevertsIfNotEnoughDurationSet() public {
+        // Arrange
+
+        // Act / Assert
     }
 }
