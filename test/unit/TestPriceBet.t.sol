@@ -169,7 +169,7 @@ contract TestPriceBet is Test {
         vm.expectRevert(PriceBet__BetNotAvailable.selector);
 
         // Act / Assert
-        priceBet.joinBet(PLAYER_ONE_SIDE);
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_ONE_SIDE);
     }
 
     function testRevertsIfSideIsSameAsPlayerOne() public {
@@ -180,7 +180,7 @@ contract TestPriceBet is Test {
         vm.expectRevert(PriceBet__CannotUseSameSide.selector);
 
         // Act / Assert
-        priceBet.joinBet(PLAYER_ONE_SIDE);
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_ONE_SIDE);
     }
 
     function testRevertsIfMsgValueIsNotEqualToWager() public {
@@ -192,5 +192,16 @@ contract TestPriceBet is Test {
 
         // Act / Assert
         priceBet.joinBet{value: (SEND_AMOUNT - 0.1 ether)}(PLAYER_TWO_SIDE);
+    }
+
+    function testRevertsIfSamePlayerTriesJoiningTheBet() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+        vm.prank(USER);
+        vm.expectRevert(PriceBet__CannotBeTheSamePlayer.selector);
+
+        // Act / Assert
+        priceBet.joinBet{value: SEND_AMOUNT}(PLAYER_TWO_SIDE);
     }
 }
