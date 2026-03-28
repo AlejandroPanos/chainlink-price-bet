@@ -34,6 +34,7 @@ contract TestPriceBet is Test {
     uint256 private constant LOWER_SEND_AMOUNT = 0.01 ether;
     uint256 private constant LOWER_DURATION = 1 minutes;
     PriceBet.Side private constant PLAYER_ONE_SIDE = PriceBet.Side.High;
+    PriceBet.Side private constant PLAYER_TWO_SIDE = PriceBet.Side.Low;
     address private priceFeed;
 
     /* Events */
@@ -48,6 +49,7 @@ contract TestPriceBet is Test {
         HelperConfig.NetworkConfig memory config = helperConfig.getConfig();
         priceFeed = config.priceFeed;
         vm.deal(USER, AMOUNT);
+        vm.deal(JOINER, AMOUNT);
     }
 
     function testContractStartsWithCorrectPriceFeed() public view {
@@ -176,8 +178,19 @@ contract TestPriceBet is Test {
         priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
         vm.prank(JOINER);
         vm.expectRevert(PriceBet__CannotUseSameSide.selector);
-        
+
         // Act / Assert
         priceBet.joinBet(PLAYER_ONE_SIDE);
+    }
+
+    function testRevertsIfMsgValueIsNotEqualToWager() public {
+        // Arrange
+        vm.prank(USER);
+        priceBet.openBet{value: SEND_AMOUNT}(TARGET_PRICE, DURATION, PLAYER_ONE_SIDE);
+        vm.prank(JOINER);
+        vm.expectRevert(PriceBet__YouMustMatchTheBet.selector);
+
+        // Act / Assert
+        priceBet.joinBet{value: (SEND_AMOUNT - 0.1 ether)}(PLAYER_TWO_SIDE);
     }
 }
